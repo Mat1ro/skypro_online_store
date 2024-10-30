@@ -1,5 +1,6 @@
 from django.db import models
 
+from skypro_online_store import settings
 from skypro_online_store.settings import NULLABLE
 
 
@@ -11,6 +12,14 @@ class Product(models.Model):
     price_per_unit = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='products',
+        verbose_name="Владелец",
+        null=True,
+        blank=True,
+    )
 
     def __str__(self):
         return self.name
