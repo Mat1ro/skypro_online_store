@@ -1,8 +1,4 @@
-import string
-from random import choice
-
 from django.contrib import messages
-from django.contrib.auth.hashers import make_password
 from django.core.mail import send_mail
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
@@ -11,12 +7,7 @@ from django.views.generic import CreateView, View
 from skypro_online_store import settings
 from users.forms import UserRegistrationForm, ResetPasswordForm
 from users.models import User
-
-
-def generate_random_password(length=8):
-    """Генерирует случайный пароль заданной длины."""
-    characters = string.ascii_letters + string.digits + string.punctuation
-    return ''.join(choice(characters) for _ in range(length))
+from users.services import reset_user_password
 
 
 class RegisterView(CreateView):
@@ -47,26 +38,16 @@ class ResetPasswordView(View):
 
     def post(self, request):
         form = ResetPasswordForm(request.POST)
+
         if form.is_valid():
             email = form.cleaned_data['email']
-            try:
-                user = User.objects.get(email=email)
-                new_password = generate_random_password()
-                print(new_password)
-                user.password = make_password(new_password)
-                user.save()
 
-                # Отправка email с новым паролем
-                send_mail(
-                    subject='Ваш новый пароль',
-                    message=f'Ваш новый пароль: {new_password}',
-                    from_email=settings.EMAIL_HOST_USER,
-                    recipient_list=[email],
-                    fail_silently=False,
-                )
-                messages.success(request, 'Новый пароль был отправлен на ваш email.')
-                return redirect('login')  # Перенаправление на страницу входа
-            except User.DoesNotExist:
-                messages.error(request, 'Пользователь с таким email не найден.')
+            success, message = reset_user_password(email)
+
+            if success:
+                messages.success(request, message)
+                return redirect('login')
+
+            messages.error(request, message)
 
         return render(request, 'password_reset.html', {'form': form})

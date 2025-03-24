@@ -65,7 +65,6 @@ class ProductUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView)
         'catalog.can_change_is_published'
     ]
 
-
     def has_permission(self):
         product = self.get_object()
         if product.owner == self.request.user:
@@ -85,13 +84,6 @@ class ProductUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView)
             form.fields = {key: form.fields[key] for key in allowed_fields if key in form.fields}
 
         return form
-
-    # def dispatch(self, request, *args, **kwargs):
-    #     product = self.get_object()
-    #     if product.owner != request.user:
-    #         return HttpResponseForbidden(
-    #             "Вы не можете редактировать этот продукт, так как вы не являетесь его владельцем.")
-    #     return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
         return reverse('product_detail', args=[self.object.id])
