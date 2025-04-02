@@ -8,7 +8,11 @@ class Product(models.Model):
     name = models.CharField(max_length=100, )
     description = models.TextField()
     image = models.ImageField(upload_to='images/', **NULLABLE)
-    category = models.CharField(max_length=100)
+    category = models.ForeignKey(
+        'Category',
+        on_delete=models.CASCADE,
+        related_name='products'
+    )
     price_per_unit = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -4,6 +4,7 @@ from django.views.generic import ListView, DetailView, TemplateView, CreateView,
 
 from catalog.forms import ProductForm
 from catalog.models import Product, Version
+from catalog.services import get_categories
 
 
 class ProductListView(ListView):
@@ -27,6 +28,7 @@ class ProductListView(ListView):
 
         # Обновляем контекст для шаблона
         context['products_with_versions'] = products_with_versions
+        context['categories'] = get_categories()
         return context
 
 
